@@ -10,6 +10,7 @@ function App() {
   const [stressScore, setStressScore] = useState(50);
   const [imageUrl, setImageUrl] = useState('');
   const [labels, setLabels] = useState('');
+  const [report, setReport] = useState('No report found yet');
   const fetchPrediction = async () => {
     try {
       const response = await fetch("http://127.0.0.1:5000/record_predict", {
@@ -18,8 +19,9 @@ function App() {
       const data = await response.json();
 
       setLabels(data.labels);
-      setStressScore(data.stress_score.toFixed(2));
+      setStressScore((data.stress_score * 100).toFixed(2));
       setImageUrl(data.image_url);
+      setReport(data.report);
       console.log(data.labels);
       console.log(data.image_url);
     } catch (error) {
@@ -42,11 +44,18 @@ function App() {
               <div className="bg-white p-6 rounded-xl shadow-md flex items-center justify-center h-40 w-48">
                 <DonutChart percentage={stressScore} />
               </div>
-              <div className={`bg-white p-6 rounded-xl shadow-md flex items-center justify-center h-40 w-64 ${micPressed ? 'bg-[url("https://example.com/your-image.jpg")] bg-cover bg-center' : ''}`}>
-                
+              <div 
+                className={`bg-white p-6 rounded-xl shadow-md flex items-center justify-center h-40 w-64`} 
+                style={{
+                  backgroundImage: micPressed ? `url(${imageUrl})` : 'none', 
+                  backgroundSize: 'cover', 
+                  backgroundPosition: 'center'
+                }}
+              >
               </div>
-              <div className="bg-white p-6 rounded-xl shadow-md flex items-center justify-center h-40 w-48">
-              <svg xmlns="http://www.w3.org/2000/svg" className="w-10" viewBox="0 0 640 512"><path d="M38.8 5.1C28.4-3.1 13.3-1.2 5.1 9.2S-1.2 34.7 9.2 42.9l592 464c10.4 8.2 25.5 6.3 33.7-4.1s6.3-25.5-4.1-33.7l-86.4-67.7 13.8 9.2c9.8 6.5 22.4 7.2 32.9 1.6s16.9-16.4 16.9-28.2l0-256c0-11.8-6.5-22.6-16.9-28.2s-23-5-32.9 1.6l-96 64L448 174.9l0 17.1 0 128 0 5.8-32-25.1L416 128c0-35.3-28.7-64-64-64L113.9 64 38.8 5.1zM407 416.7L32.3 121.5c-.2 2.1-.3 4.3-.3 6.5l0 256c0 35.3 28.7 64 64 64l256 0c23.4 0 43.9-12.6 55-31.3z"/></svg>
+              <div className="bg-white p-6 rounded-xl shadow-md flex-col items-center justify-center h-40 w-48">
+                <h1 className="font-bold">Current Mood</h1>
+                <h1>{labels}</h1>
               </div>
             </div>
             <div className="row-2 flex">
@@ -76,7 +85,7 @@ function App() {
 
           {/* Right side */}
           <div className="rightside bg-white p-6 rounded-xl shadow-md flex items-center justify-center h-full w-full">
-            {/* Right content */}
+            <p>{report}</p>
           </div>
         </div>
 
